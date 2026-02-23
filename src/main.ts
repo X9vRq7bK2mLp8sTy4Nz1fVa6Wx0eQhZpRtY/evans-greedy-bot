@@ -169,70 +169,49 @@ app.get("/delete-request", async (c) => {
     return c.json({ success: true });
 });
 
-const NEXUS_ICON = "https://cdn.discordapp.com/icons/" + (Deno.env.get("GUILD_ID") ?? "") + "/" + (Deno.env.get("GUILD_ICON") ?? "") + ".png";
+const NEXUS_ICON = (id: string, icon: string) => id && icon ? `https://cdn.discordapp.com/icons/${id}/${icon}.png` : "";
 
-function page(title: string, body: string, accent: string = "#4f59c1"): string {
-    return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${title} — Nexus</title><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet"><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Inter',sans-serif;background:#0f1117;color:#e2e8f0;min-height:100vh;display:flex;align-items:center;justify-content:center}.card{background:#1a1f2e;border:1px solid #2d3553;border-radius:16px;padding:48px 40px;max-width:440px;width:90%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,.5)}.icon{font-size:56px;margin-bottom:20px}.server-name{font-size:13px;font-weight:600;color:${accent};letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px}.title{font-size:28px;font-weight:700;margin-bottom:12px}.subtitle{font-size:15px;color:#94a3b8;line-height:1.6}.id-tag{display:inline-block;margin-top:20px;background:#0f1117;border:1px solid #2d3553;border-radius:8px;padding:8px 16px;font-size:13px;color:#64748b;font-family:monospace}</style></head><body><div class="card">${body}</div></body></html>`;
+function page(title: string, body: string, isError = false): string {
+    const guildId = Deno.env.get("GUILD_ID") ?? "";
+    const guildIcon = Deno.env.get("GUILD_ICON") ?? "";
+    const iconUrl = NEXUS_ICON(guildId, guildIcon);
+    const accent = isError ? "#ef4444" : "#ffffff";
+    return `<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${title} — Nexus</title><link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"><style>*{box-sizing:border-box;margin:0;padding:0}body{font-family:'Inter',sans-serif;background:#000;color:#fff;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}.card{background:#09090b;border:1px solid #27272a;padding:48px 32px;max-width:380px;width:100%;text-align:center}.icon{width:64px;height:64px;border-radius:50%;background:#000;border:1px solid #27272a;margin:0 auto 24px;display:flex;align-items:center;justify-content:center;overflow:hidden}.icon img{width:100%;height:100%;object-fit:cover}.server{font-size:12px;font-weight:600;color:#71717a;letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px}.title{font-size:20px;font-weight:600;margin-bottom:12px;color:${accent}}.subtitle{font-size:14px;color:#a1a1aa;line-height:1.6;margin-bottom:24px}.id{display:inline-block;background:#18181b;border:1px solid #27272a;padding:6px 12px;font-size:11px;color:#71717a;font-family:ui-monospace,monospace;letter-spacing:.05em}</style></head><body><div class="card"><div class="icon">${iconUrl ? `<img src="${iconUrl}" alt="Nexus">` : `<span>N</span>`}</div><div class="server">Nexus</div>${body}</div></body></html>`.replace(/>\s+</g, '><').trim();
 }
 
 app.get("/passed", (c) => {
-    const userId = c.req.query("id") ?? "";
-    const body = `
-        <div class="server-name">Nexus</div>
-        <div class="icon">&#10003;</div>
-        <div class="title" style="color:#4f59c1">Verified Successfully</div>
-        <div class="subtitle">Your account has been verified and you now have access to Nexus.</div>
-        ${userId ? `<div class="id-tag">ID: ${userId}</div>` : ""}
-    `;
-    return c.html(page("Verified", body));
+    const id = c.req.query("id") ?? "";
+    return c.html(page("Verified", `
+        <div class="title">Verification Successful</div>
+        <p class="subtitle">Your identity has been confirmed. You may now return to the Nexus server.</p>
+        ${id ? `<div class="id">UID: ${id}</div>` : ""}
+    `));
 });
 
 app.get("/flagged", (c) => {
-    const reason = c.req.query("reason") ?? "unknown";
-    const messages: Record<string, string> = {
-        muted: "Your account is currently muted and cannot be verified.",
-        alt: "Your account has been flagged as an alternate account.",
-        vpn: "VPN, proxy, and hosting connections are not permitted during verification.",
-    };
-    const body = `
-        <div class="server-name">Nexus</div>
-        <div class="icon">&#x26A0;</div>
-        <div class="title" style="color:#e74c3c">Verification Blocked</div>
-        <div class="subtitle">${messages[reason] ?? "Your verification was blocked. Please contact a staff member."}</div>
-    `;
-    return c.html(page("Blocked", body, "#e74c3c"));
+    const r = c.req.query("reason") ?? "";
+    const msg = r === "muted" ? "Your account is currently muted." : r === "vpn" ? "VPN/Proxy connections are not permitted." : "Your verification request was flagged.";
+    return c.html(page("Flagged", `
+        <div class="title">Access Denied</div>
+        <p class="subtitle">${msg}</p>
+    `, true));
 });
 
-app.get("/altflagged", (c) => {
-    const body = `
-        <div class="server-name">Nexus</div>
-        <div class="icon">&#x26A0;</div>
-        <div class="title" style="color:#e74c3c">Alt Account Detected</div>
-        <div class="subtitle">Your IP address is associated with an existing account. You have been flagged as an alternate account. Contact staff if this is a mistake.</div>
-    `;
-    return c.html(page("Alt Detected", body, "#e74c3c"));
-});
+app.get("/altflagged", (c) => c.html(page("Alt Detected", `
+    <div class="title">Security Flag</div>
+    <p class="subtitle">This IP is already linked to another account. Alternate accounts are not permitted.</p>
+`, true)));
 
-app.get("/mobile", (c) => {
-    const body = `
-        <div class="server-name">Nexus</div>
-        <div class="icon">&#128241;</div>
-        <div class="title" style="color:#f39c12">Mobile Data Detected</div>
-        <div class="subtitle">Verification over mobile data is not permitted. Please connect to Wi-Fi and try again.</div>
-    `;
-    return c.html(page("Mobile Blocked", body, "#f39c12"));
-});
+app.get("/mobile", (c) => c.html(page("Mobile Blocked", `
+    <div class="title">Incompatible Connection</div>
+    <p class="subtitle">Verification is not permitted over mobile data. Please use a stable Wi-Fi connection.</p>
+`, true)));
 
-app.get("/error", (c) => {
-    const reason = c.req.query("reason") ?? "unknown";
-    const body = `
-        <div class="server-name">Nexus</div>
-        <div class="icon">&#x2716;</div>
-        <div class="title" style="color:#e74c3c">Something Went Wrong</div>
-        <div class="subtitle">Verification failed: <code>${reason}</code>. Please try again or contact a staff member.</div>
-    `;
-    return c.html(page("Error", body, "#e74c3c"));
-});
+app.get("/error", (c) => c.html(page("Error", `
+    <div class="title">System Error</div>
+    <p class="subtitle">Something went wrong during the verification process. Please try again later.</p>
+    <div class="id">CODE: ${c.req.query("reason") ?? "UNK"}</div>
+`, true)));
 
 Deno.serve({ port: PORT, onListen: ({ port }) => console.log(`[HTTP] Verification server running on port ${port}`) }, app.fetch);
 
