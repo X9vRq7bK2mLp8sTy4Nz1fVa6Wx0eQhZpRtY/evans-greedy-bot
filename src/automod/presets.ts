@@ -25,9 +25,9 @@ export const PRESETS: Record<string, AutoModPreset> = {
         regexPatterns: [
             "(d[i1]sc[o0]rd\\.gg\\/\\w+)",
             "(bit\\.ly\\/\\S+)",
-            "(https?:\\/\\/(?!discord\\.com|discord\\.gg)\\S+\\.\\S+\\/\\S*(?:free|nitro|win|gift)\\S*)",
+            "(https?:\\/\\/\\S+\\.\\S+\\/\\S*(?:free|nitro|win|gift)\\S*)",
         ],
-        allowedKeywords: ["discord.gg/nexus"],
+        allowedKeywords: ["discord.gg/nexus", "discord.com", "discord.gg"],
     },
     High: {
         description: "Aggressive filtering. Blocks all external links, hate speech, and promotion.",
@@ -41,9 +41,9 @@ export const PRESETS: Record<string, AutoModPreset> = {
         regexPatterns: [
             "(d[i1]sc[o0]rd\\.gg\\/\\w+)",
             "(bit\\.ly\\/\\S+)",
-            "(https?:\\/\\/(?!discord\\.com|discord\\.gg)\\S+\\.\\S+)",
+            "(https?:\\/\\/\\S+\\.\\S+)",
             "([\\w.+-]+@[\\w-]+\\.[a-zA-Z]{2,})",
         ],
-        allowedKeywords: ["discord.gg/nexus", "discord.com"],
+        allowedKeywords: ["discord.gg/nexus", "discord.com", "discord.gg"],
     },
 };
