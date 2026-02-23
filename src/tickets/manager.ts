@@ -1,3 +1,4 @@
+import { Buffer } from "node:buffer";
 import type { Guild, TextChannel, GuildMember, Client } from "discord.js";
 import {
     ChannelType,

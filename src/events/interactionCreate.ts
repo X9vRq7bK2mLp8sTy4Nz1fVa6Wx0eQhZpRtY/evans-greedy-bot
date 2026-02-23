@@ -1,3 +1,4 @@
+import { Buffer } from "node:buffer";
 import type { Interaction, GuildMember, TextChannel } from "discord.js";
 import { buildEmbed, buildErrorEmbed } from "../utils/embed.ts";
 import { createTicket, closeTicket, claimTicket, getOpenTicket } from "../tickets/manager.ts";
