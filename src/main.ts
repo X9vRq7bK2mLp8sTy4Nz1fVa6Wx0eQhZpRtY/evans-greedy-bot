@@ -19,7 +19,7 @@ import onMessageCreate from "./events/messageCreate.ts";
 
 import setAdminCommand from "./commands/set-admin.ts";
 import sendPanelCommand from "./commands/send-panel.ts";
-import autoRoleCommand from "./commands/autorole.ts";
+// import autoRoleCommand from "./commands/autorole.ts";
 import welcomeCommand from "./commands/welcome.ts";
 import embedCommand from "./commands/embed.ts";
 import manVerifyCommand from "./commands/manverify.ts";
@@ -27,11 +27,13 @@ import deletePendingCommand from "./commands/deletepending.ts";
 import automodCommand from "./commands/automod.ts";
 import ticketCommand from "./commands/ticket.ts";
 import setVerifiedRoleCommand from "./commands/set-verified-role.ts";
+import setUnverifiedRoleCommand from "./commands/set-unverified-role.ts";
 
 const TOKEN = Deno.env.get("DISCORD_TOKEN");
 const CLIENT_ID = Deno.env.get("DISCORD_CLIENT_ID") || "";
 
 if (!TOKEN) throw new Error("DISCORD_TOKEN is not set");
+if (!CLIENT_ID) throw new Error("DISCORD_CLIENT_ID is not set");
 
 await connectDB();
 
@@ -51,7 +53,7 @@ client.commands = new Collection<string, Command>();
 const commands: Command[] = [
     setAdminCommand,
     sendPanelCommand,
-    autoRoleCommand,
+    // autoRoleCommand,
     welcomeCommand,
     embedCommand,
     manVerifyCommand,
@@ -59,6 +61,7 @@ const commands: Command[] = [
     automodCommand,
     ticketCommand,
     setVerifiedRoleCommand,
+    setUnverifiedRoleCommand,
 ];
 
 for (const cmd of commands) {
@@ -73,14 +76,25 @@ client.on("interactionCreate", onInteractionCreate);
 client.on("messageCreate", onMessageCreate);
 
 client.once("ready", async () => {
-    const guilds = client.guilds.cache.map(g => g.id);
+    const GUILD_ID = Deno.env.get("GUILD_ID");
     const cmdData = commands.map(c => c.data.toJSON());
-    for (const guildId of guilds) {
-        await rest
-            .put(Routes.applicationGuildCommands(CLIENT_ID, guildId), { body: cmdData })
-            .catch(e => console.error(`[DEPLOY] Failed for guild ${guildId}:`, e));
+
+    try {
+        if (GUILD_ID) {
+            await rest.put(Routes.applicationGuildCommands(CLIENT_ID, GUILD_ID), { body: cmdData });
+            console.log(`[DEPLOY] Slash commands deployed to guild: ${GUILD_ID}`);
+        } else {
+            // Fallback: register for all guilds currently joined
+            const guilds = client.guilds.cache.map(g => g.id);
+            for (const id of guilds) {
+                await rest.put(Routes.applicationGuildCommands(CLIENT_ID, id), { body: cmdData })
+                    .catch(e => console.error(`[DEPLOY] Failed for guild ${id}:`, e));
+            }
+            console.log(`[DEPLOY] Slash commands deployed to ${guilds.length} guild(s).`);
+        }
+    } catch (err) {
+        console.error("[DEPLOY] Error deploying commands:", err);
     }
-    console.log(`[DEPLOY] Slash commands deployed to ${guilds.length} guild(s).`);
 });
 
 const verificationMap = new Map<string, (data: any) => void>();

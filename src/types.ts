@@ -18,6 +18,7 @@ export interface GuildConfig {
     altRoleId?: string;
     mutedRoleId?: string;
     autoRoleId?: string;
+    unverifiedRoleId?: string;
     welcomeChannelId?: string;
     logChannelId?: string;
     ticketCategoryId?: string;

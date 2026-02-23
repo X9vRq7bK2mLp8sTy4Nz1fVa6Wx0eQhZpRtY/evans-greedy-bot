@@ -1,5 +1,12 @@
 import { Buffer } from "node:buffer";
-import type { Interaction, GuildMember, TextChannel } from "discord.js";
+import {
+    type Interaction,
+    type GuildMember,
+    type TextChannel,
+    ActionRowBuilder,
+    ButtonBuilder,
+    ButtonStyle,
+} from "discord.js";
 import { buildEmbed, buildErrorEmbed } from "../utils/embed.ts";
 import { createTicket, closeTicket, claimTicket, getOpenTicket } from "../tickets/manager.ts";
 import { isAdmin } from "../utils/guards.ts";
@@ -124,6 +131,44 @@ export default async function onInteractionCreate(interaction: Interaction) {
             return interaction.reply({
                 embeds: [buildEmbed({ title: "Transcript", description: `>>> **${ticket.messages.length}** messages archived.`, timestamp: true })],
                 files: [attachment],
+                ephemeral: true,
+            });
+        }
+
+        if (customId === "verify_start") {
+            const config = await getGuildConfig(guild.id);
+            const verifiedRoleIds = config?.memberRoleIds ?? [];
+            const member = interaction.member as GuildMember;
+
+            const hasVerifiedRole = verifiedRoleIds.some(id => member.roles.cache.has(id));
+
+            if (hasVerifiedRole) {
+                return interaction.reply({
+                    embeds: [buildEmbed({
+                        description: ">>> **Already Verified!**\n\nYou have already completed the verification process and have access to the server.",
+                        timestamp: true,
+                    })],
+                    ephemeral: true,
+                });
+            }
+
+            const { buildOAuthUrl } = await import("../utils/oauth.ts");
+            const oauthUrl = buildOAuthUrl(Deno.env.get("DISCORD_CLIENT_ID") || "");
+
+            return interaction.reply({
+                embeds: [buildEmbed({
+                    title: "Verification Link",
+                    description: ">>> Click the button below to start the verification process.\n\n**Note:** You will be redirected to our secure verification portal.",
+                    timestamp: true,
+                })],
+                components: [
+                    new ActionRowBuilder<ButtonBuilder>().addComponents(
+                        new ButtonBuilder()
+                            .setLabel("Verify with Discord")
+                            .setURL(oauthUrl)
+                            .setStyle(ButtonStyle.Link)
+                    )
+                ],
                 ephemeral: true,
             });
         }

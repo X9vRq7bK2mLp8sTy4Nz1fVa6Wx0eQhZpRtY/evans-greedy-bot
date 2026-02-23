@@ -8,8 +8,8 @@ export default async function onGuildMemberAdd(member: GuildMember) {
     const config = await getGuildConfig(member.guild.id);
     if (!config) return;
 
-    if (config.autoRoleId) {
-        await grantRole(member.guild, member.id, config.autoRoleId).catch(console.error);
+    if (config.unverifiedRoleId) {
+        await grantRole(member.guild, member.id, config.unverifiedRoleId).catch(console.error);
     }
 
     if (config.welcomeChannelId) {

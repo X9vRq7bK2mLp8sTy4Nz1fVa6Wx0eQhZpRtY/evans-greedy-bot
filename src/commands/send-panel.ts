@@ -70,9 +70,9 @@ export default {
             });
 
             const verifyBtn = new ButtonBuilder()
+                .setCustomId("verify_start")
                 .setLabel("Verify Now")
-                .setURL(oauthUrl)
-                .setStyle(ButtonStyle.Link);
+                .setStyle(ButtonStyle.Primary);
             const row = new ActionRowBuilder<ButtonBuilder>().addComponents(verifyBtn);
 
             await channel.send({ embeds: [embed], files: [attachment], components: [row] });
