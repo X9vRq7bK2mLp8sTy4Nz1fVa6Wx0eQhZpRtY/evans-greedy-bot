@@ -1,4 +1,3 @@
-import "dotenv/config";
 import {
     Client,
     GatewayIntentBits,
@@ -7,7 +6,6 @@ import {
     Routes,
 } from "discord.js";
 import { Hono } from "hono";
-import { serve } from "@hono/node-server";
 import { connectDB, checkVerified, setVerified, addPendingDeletion, getGuildConfig } from "./db/mongo.ts";
 import { getIpData } from "./utils/ip.ts";
 import { getToken, getUserData, invalidateToken } from "./utils/oauth.ts";
@@ -169,8 +167,6 @@ app.get("/delete-request", async (c) => {
     return c.json({ success: true });
 });
 
-serve({ fetch: app.fetch, port: PORT }, () => {
-    console.log(`[HTTP] Verification server running on port ${PORT}`);
-});
+Deno.serve({ port: PORT, onListen: ({ port }) => console.log(`[HTTP] Verification server running on port ${port}`) }, app.fetch);
 
 await client.login(TOKEN);
