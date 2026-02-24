@@ -89,6 +89,7 @@ export default {
                     description: `>>> **Lock Target:** ${lockTarget}\n**Hidden From:** ${hideTarget}`,
                     timestamp: true,
                 })],
+                ephemeral: true,
             });
         } catch (err) {
             return interaction.reply({ embeds: [buildErrorEmbed(`Failed to update permissions: ${(err as Error).message}`)], ephemeral: true });
