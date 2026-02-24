@@ -29,6 +29,22 @@ import ticketCommand from "./commands/ticket.ts";
 import setVerifiedRoleCommand from "./commands/set-verified-role.ts";
 import setUnverifiedRoleCommand from "./commands/set-unverified-role.ts";
 import cantTalkCommand from "./commands/cant-talk.ts";
+import banCommand from "./commands/ban.ts";
+import unbanCommand from "./commands/unban.ts";
+import kickCommand from "./commands/kick.ts";
+import muteCommand from "./commands/mute.ts";
+import unmuteCommand from "./commands/unmute.ts";
+import warnCommand from "./commands/warn.ts";
+import warningsCommand from "./commands/warnings.ts";
+import clearwarningsCommand from "./commands/clearwarnings.ts";
+import purgeCommand from "./commands/purge.ts";
+import slowmodeCommand from "./commands/slowmode.ts";
+import softbanCommand from "./commands/softban.ts";
+import nickCommand from "./commands/nick.ts";
+import roleCommand from "./commands/role.ts";
+import userinfoCommand from "./commands/userinfo.ts";
+import serverinfoCommand from "./commands/serverinfo.ts";
+import setModlogCommand from "./commands/set-modlog.ts";
 
 const TOKEN = Deno.env.get("DISCORD_TOKEN");
 const CLIENT_ID = Deno.env.get("DISCORD_CLIENT_ID") || "";
@@ -64,6 +80,22 @@ const commands: Command[] = [
     setVerifiedRoleCommand,
     setUnverifiedRoleCommand,
     cantTalkCommand,
+    banCommand,
+    unbanCommand,
+    kickCommand,
+    muteCommand,
+    unmuteCommand,
+    warnCommand,
+    warningsCommand,
+    clearwarningsCommand,
+    purgeCommand,
+    slowmodeCommand,
+    softbanCommand,
+    nickCommand,
+    roleCommand,
+    userinfoCommand,
+    serverinfoCommand,
+    setModlogCommand,
 ];
 
 for (const cmd of commands) {

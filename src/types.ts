@@ -23,6 +23,7 @@ export interface GuildConfig {
     logChannelId?: string;
     ticketCategoryId?: string;
     ticketStaffRoleId?: string;
+    modLogChannelId?: string;
 }
 
 export interface VerificationRecord {
@@ -58,6 +59,16 @@ export interface AutoModApplied {
     guildId: string;
     presetName: string;
     appliedAt: Date;
+}
+
+export interface Warning {
+    guildId: string;
+    userId: string;
+    userTag: string;
+    modId: string;
+    modTag: string;
+    reason: string;
+    createdAt: Date;
 }
 
 export interface ExtendedClient extends Client {

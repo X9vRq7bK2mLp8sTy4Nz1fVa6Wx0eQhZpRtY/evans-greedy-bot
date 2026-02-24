@@ -1,5 +1,5 @@
 import { MongoClient, Db, Collection } from "mongodb";
-import type { GuildConfig, VerificationRecord, PendingDeletion, TicketRecord, AutoModApplied } from "../types.ts";
+import type { GuildConfig, VerificationRecord, PendingDeletion, TicketRecord, AutoModApplied, Warning } from "../types.ts";
 
 let client: MongoClient;
 let db: Db;
@@ -88,6 +88,30 @@ export async function processPendingDeletions(): Promise<string[]> {
         await pendingDeletions().deleteMany({});
     }
     return ids;
+}
+
+export function warnings(): Collection<Warning> {
+    return db.collection<Warning>("warnings");
+}
+
+export async function addWarning(warning: Warning): Promise<void> {
+    await warnings().insertOne(warning);
+}
+
+export async function getWarnings(guildId: string, userId?: string): Promise<Warning[]> {
+    const filter: Record<string, string> = { guildId };
+    if (userId) filter.userId = userId;
+    return await warnings().find(filter).sort({ createdAt: -1 }).toArray();
+}
+
+export async function clearUserWarnings(guildId: string, userId: string): Promise<number> {
+    const result = await warnings().deleteMany({ guildId, userId });
+    return result.deletedCount;
+}
+
+export async function clearAllWarnings(guildId: string): Promise<number> {
+    const result = await warnings().deleteMany({ guildId });
+    return result.deletedCount;
 }
 
 export async function closeDB(): Promise<void> {
