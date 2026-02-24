@@ -28,6 +28,7 @@ import automodCommand from "./commands/automod.ts";
 import ticketCommand from "./commands/ticket.ts";
 import setVerifiedRoleCommand from "./commands/set-verified-role.ts";
 import setUnverifiedRoleCommand from "./commands/set-unverified-role.ts";
+import cantTalkCommand from "./commands/cant-talk.ts";
 
 const TOKEN = Deno.env.get("DISCORD_TOKEN");
 const CLIENT_ID = Deno.env.get("DISCORD_CLIENT_ID") || "";
@@ -62,6 +63,7 @@ const commands: Command[] = [
     ticketCommand,
     setVerifiedRoleCommand,
     setUnverifiedRoleCommand,
+    cantTalkCommand,
 ];
 
 for (const cmd of commands) {

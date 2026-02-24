@@ -30,7 +30,7 @@ export default async function onGuildMemberAdd(member: GuildMember) {
                 thumbnail: true,
                 timestamp: true,
             });
-            await channel.send({ embeds: [embed], files: [attachment] }).catch(console.error);
+            await channel.send({ content: `<@${member.id}>`, embeds: [embed], files: [attachment] }).catch(console.error);
         }
     }
 
