@@ -24,6 +24,7 @@ export interface GuildConfig {
     ticketCategoryId?: string;
     ticketStaffRoleId?: string;
     modLogChannelId?: string;
+    systemLogChannelId?: string;
 }
 
 export interface VerificationRecord {

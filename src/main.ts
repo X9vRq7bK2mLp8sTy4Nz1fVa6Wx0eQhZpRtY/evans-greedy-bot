@@ -45,6 +45,7 @@ import roleCommand from "./commands/role.ts";
 import userinfoCommand from "./commands/userinfo.ts";
 import serverinfoCommand from "./commands/serverinfo.ts";
 import setModlogCommand from "./commands/set-modlog.ts";
+import setSystemLogsCommand from "./commands/set-system-logs.ts";
 
 const TOKEN = Deno.env.get("DISCORD_TOKEN");
 const CLIENT_ID = Deno.env.get("DISCORD_CLIENT_ID") || "";
@@ -96,6 +97,7 @@ const commands: Command[] = [
     userinfoCommand,
     serverinfoCommand,
     setModlogCommand,
+    setSystemLogsCommand,
 ];
 
 for (const cmd of commands) {
@@ -173,12 +175,12 @@ app.get("/callback", async (c) => {
     const memberRoles = config?.memberRoleIds ?? [];
 
     if (mutedRoleId && await checkRole(guild, user.id, mutedRoleId)) {
-        await logEmbedWebhook(client, buildLogEmbed("Verification Blocked", `<@${user.id}> tried to verify while muted.`, 0xe74c3c));
+        await logEmbedWebhook(client, buildLogEmbed("Verification Blocked", `<@${user.id}> tried to verify while muted.`, 0xe74c3c), guildId);
         return c.redirect("/flagged?reason=muted");
     }
 
     if (altRoleId && await checkRole(guild, user.id, altRoleId)) {
-        await logEmbedWebhook(client, buildLogEmbed("Alt Blocked", `<@${user.id}> tried to verify while flagged as alt.`, 0xe74c3c));
+        await logEmbedWebhook(client, buildLogEmbed("Alt Blocked", `<@${user.id}> tried to verify while flagged as alt.`, 0xe74c3c), guildId);
         return c.redirect("/flagged?reason=alt");
     }
 
@@ -186,14 +188,14 @@ app.get("/callback", async (c) => {
     const existing = await checkVerified(ipHash);
     if (existing && existing.userId !== user.id) {
         if (altRoleId) await grantRole(guild, user.id, altRoleId);
-        await logEmbedWebhook(client, buildLogEmbed("Alt Account Detected", `<@${user.id}> was flagged as an alt of <@${existing.userId}>.`, 0xe74c3c));
+        await logEmbedWebhook(client, buildLogEmbed("Alt Account Detected", `<@${user.id}> was flagged as an alt of <@${existing.userId}>.`, 0xe74c3c), guildId);
         return c.redirect("/altflagged");
     }
 
     const ipData = await getIpData(ip).catch(() => null);
     if (ipData) {
         if (ipData.mobile) {
-            await logEmbedWebhook(client, buildLogEmbed("Mobile Verification", `<@${user.id}> tried to verify over mobile data.`, 0xf39c12));
+            await logEmbedWebhook(client, buildLogEmbed("Mobile Verification", `<@${user.id}> tried to verify over mobile data.`, 0xf39c12), guildId);
             return c.redirect("/mobile");
         }
         if (ipData.proxy || ipData.hosting) {

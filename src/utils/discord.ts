@@ -1,5 +1,13 @@
-import type { Guild, Client, RoleResolvable, GuildMemberResolvable } from "discord.js";
-import { WebhookClient, EmbedBuilder } from "discord.js";
+import {
+    WebhookClient,
+    EmbedBuilder,
+    type TextChannel,
+    type Guild,
+    type Client,
+    type RoleResolvable,
+    type GuildMemberResolvable,
+} from "discord.js";
+import { getGuildConfig } from "../db/mongo.ts";
 
 const COLOUR = 0x4f59c1;
 const FOOTER = "Nexus";
@@ -36,18 +44,43 @@ export async function checkRole(
     return member.roles.cache.has(roleId);
 }
 
-export async function logWebhook(client: Client, content: string): Promise<void> {
+export async function logWebhook(client: Client, content: string, guildId?: string): Promise<void> {
+    if (guildId) {
+        const config = await getGuildConfig(guildId);
+        if (config?.systemLogChannelId) {
+            const guild = client.guilds.cache.get(guildId);
+            const channel = guild?.channels.cache.get(config.systemLogChannelId) as TextChannel | undefined;
+            if (channel) {
+                const embed = buildLogEmbed("System Log", content);
+                await channel.send({ embeds: [embed] }).catch(() => { });
+                return;
+            }
+        }
+    }
+
     const url = Deno.env.get("LOG_WEBHOOK_URL");
     if (!url || !client.user) return;
     const webhookClient = new WebhookClient({ url });
     await webhookClient.send({
         username: client.user.username,
         avatarURL: client.user.avatarURL() ?? undefined,
-        content,
+        content: `>>> ${content}`,
     }).catch(console.error);
 }
 
-export async function logEmbedWebhook(client: Client, embed: EmbedBuilder): Promise<void> {
+export async function logEmbedWebhook(client: Client, embed: EmbedBuilder, guildId?: string): Promise<void> {
+    if (guildId) {
+        const config = await getGuildConfig(guildId);
+        if (config?.systemLogChannelId) {
+            const guild = client.guilds.cache.get(guildId);
+            const channel = guild?.channels.cache.get(config.systemLogChannelId) as TextChannel | undefined;
+            if (channel) {
+                await channel.send({ embeds: [embed] }).catch(() => { });
+                return;
+            }
+        }
+    }
+
     const url = Deno.env.get("LOG_WEBHOOK_URL");
     if (!url || !client.user) return;
     const webhookClient = new WebhookClient({ url });
@@ -62,7 +95,7 @@ export function buildLogEmbed(title: string, description: string, colour?: numbe
     return new EmbedBuilder()
         .setColor(colour ?? COLOUR)
         .setTitle(title)
-        .setDescription(description)
+        .setDescription(`>>> ${description}`)
         .setFooter({ text: FOOTER })
         .setTimestamp();
 }

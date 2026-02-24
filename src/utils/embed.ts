@@ -25,7 +25,7 @@ export function buildEmbed(opts: EmbedOptions): EmbedBuilder {
     if (opts.fields && opts.fields.length > 0) e.addFields(opts.fields);
     if (opts.thumbnail) e.setThumbnail(`attachment://${pngAttachmentName()}`);
     e.setFooter({ text: opts.footer ?? FOOTER_TEXT });
-    if (opts.timestamp) e.setTimestamp();
+    if (opts.timestamp !== false) e.setTimestamp();
     return e;
 }
 
@@ -33,14 +33,16 @@ export function buildErrorEmbed(description: string): EmbedBuilder {
     return new EmbedBuilder()
         .setColor(0xe74c3c)
         .setDescription(`>>> ${description}`)
-        .setFooter({ text: FOOTER_TEXT });
+        .setFooter({ text: FOOTER_TEXT })
+        .setTimestamp();
 }
 
 export function buildSuccessEmbed(description: string): EmbedBuilder {
     return new EmbedBuilder()
         .setColor(COLOUR)
         .setDescription(`>>> ${description}`)
-        .setFooter({ text: FOOTER_TEXT });
+        .setFooter({ text: FOOTER_TEXT })
+        .setTimestamp();
 }
 
 export function getPngPath(): string {

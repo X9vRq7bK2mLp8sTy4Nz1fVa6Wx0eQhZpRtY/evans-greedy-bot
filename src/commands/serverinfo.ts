@@ -51,17 +51,17 @@ export default {
             .setAuthor({ name: guild.name, iconURL: guild.iconURL() ?? undefined })
             .setThumbnail(guild.iconURL({ size: 256 }))
             .addFields(
-                { name: "Owner", value: `${owner.user.tag}`, inline: true },
-                { name: "Members", value: `${guild.memberCount}`, inline: true },
-                { name: "Roles", value: `${guild.roles.cache.size}`, inline: true },
-                { name: "Text Channels", value: `${textChannels}`, inline: true },
-                { name: "Voice Channels", value: `${voiceChannels}`, inline: true },
-                { name: "Categories", value: `${categories}`, inline: true },
-                { name: "Boost Level", value: BOOST_TIERS[guild.premiumTier] ?? "Unknown", inline: true },
-                { name: "Boosts", value: `${guild.premiumSubscriptionCount ?? 0}`, inline: true },
-                { name: "Verification Level", value: VERIFICATION_LEVELS[guild.verificationLevel] ?? "Unknown", inline: true },
-                { name: "Created", value: createdAt, inline: true },
-                { name: "Server ID", value: guild.id, inline: true },
+                { name: "Owner", value: `>>> <@${owner.id}>`, inline: true },
+                { name: "Members", value: `>>> ${guild.memberCount}`, inline: true },
+                { name: "Roles", value: `>>> ${guild.roles.cache.size}`, inline: true },
+                { name: "Text Channels", value: `>>> ${textChannels}`, inline: true },
+                { name: "Voice Channels", value: `>>> ${voiceChannels}`, inline: true },
+                { name: "Categories", value: `>>> ${categories}`, inline: true },
+                { name: "Boost Level", value: `>>> ${BOOST_TIERS[guild.premiumTier] ?? "Unknown"}`, inline: true },
+                { name: "Boosts", value: `>>> ${guild.premiumSubscriptionCount ?? 0}`, inline: true },
+                { name: "Verification Level", value: `>>> ${VERIFICATION_LEVELS[guild.verificationLevel] ?? "Unknown"}`, inline: true },
+                { name: "Created", value: `>>> ${createdAt}`, inline: true },
+                { name: "Server ID", value: `>>> ${guild.id}`, inline: true },
             )
             .setFooter({ text: "Nexus" })
             .setTimestamp();

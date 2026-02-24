@@ -37,7 +37,7 @@ export async function sendModLog(guild: Guild, entry: ModLogEntry): Promise<void
         .setColor(colour)
         .setAuthor({ name: `${entry.moderator.tag}`, iconURL: entry.moderator.displayAvatarURL() })
         .setDescription(
-            `**Action:** ${entry.action}\n` +
+            `>>> **Action:** ${entry.action}\n` +
             `**Target:** ${entry.target.tag} (${entry.target.id})\n` +
             `**Reason:** ${entry.reason ?? "No reason provided"}` +
             (entry.extra ? `\n${entry.extra}` : "")

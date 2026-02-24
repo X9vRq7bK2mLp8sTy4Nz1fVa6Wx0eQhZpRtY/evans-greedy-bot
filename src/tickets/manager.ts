@@ -125,7 +125,7 @@ export async function createTicket(
     await logEmbedWebhook(client, buildLogEmbed(
         "Ticket Opened",
         `<@${member.id}> opened a ticket in <#${channel.id}>.${topic ? `\n\n**Topic:** ${topic}` : ""}`,
-    ));
+    ), guild.id);
 
     return channel;
 }
@@ -167,10 +167,10 @@ export async function closeTicket(
                 title: "Ticket Transcript",
                 description: `>>> Transcript for ticket opened by <@${ticket.userId}>.`,
                 fields: [
-                    { name: "Channel", value: `#${channel.name}`, inline: true },
-                    { name: "Opened by", value: `<@${ticket.userId}>`, inline: true },
-                    { name: "Closed by", value: `<@${closedBy.id}>`, inline: true },
-                    { name: "Messages", value: `${ticket.messages.length}`, inline: true },
+                    { name: "Channel", value: `>>> #${channel.name}`, inline: true },
+                    { name: "Opened by", value: `>>> <@${ticket.userId}>`, inline: true },
+                    { name: "Closed by", value: `>>> <@${closedBy.id}>`, inline: true },
+                    { name: "Messages", value: `>>> ${ticket.messages.length}`, inline: true },
                 ],
                 timestamp: true,
             })],
@@ -186,7 +186,7 @@ export async function closeTicket(
     await logEmbedWebhook(client, buildLogEmbed(
         "Ticket Closed",
         `<@${closedBy.id}> closed ticket <#${channel.id}> (opened by <@${ticket.userId}>).`,
-    ));
+    ), channel.guildId);
 
     setTimeout(async () => {
         await channel.delete("Ticket closed").catch(console.error);

@@ -66,14 +66,14 @@ export default {
             .setAuthor({ name: target.user.tag, iconURL: target.user.displayAvatarURL() })
             .setThumbnail(target.user.displayAvatarURL({ size: 256 }))
             .addFields(
-                { name: "ID", value: target.id, inline: true },
-                { name: "Nickname", value: target.nickname ?? "None", inline: true },
-                { name: "Join Position", value: `#${joinPosition}`, inline: true },
-                { name: "Account Created", value: createdAt, inline: true },
-                { name: "Joined Server", value: joinedAt, inline: true },
-                { name: "Highest Role", value: `<@&${target.roles.highest.id}>`, inline: true },
-                { name: `Roles [${target.roles.cache.size - 1}]`, value: roles.length > 1024 ? roles.slice(0, 1020) + "..." : roles, inline: false },
-                { name: "Key Permissions", value: perms, inline: false },
+                { name: "ID", value: `>>> ${target.id}`, inline: true },
+                { name: "Nickname", value: `>>> ${target.nickname ?? "None"}`, inline: true },
+                { name: "Join Position", value: `>>> #${joinPosition}`, inline: true },
+                { name: "Account Created", value: `>>> ${createdAt}`, inline: true },
+                { name: "Joined Server", value: `>>> ${joinedAt}`, inline: true },
+                { name: "Highest Role", value: `>>> <@&${target.roles.highest.id}>`, inline: true },
+                { name: `Roles [${target.roles.cache.size - 1}]`, value: `>>> ${roles.length > 1020 ? roles.slice(0, 1016) + "..." : roles}`, inline: false },
+                { name: "Key Permissions", value: `>>> ${perms}`, inline: false },
             )
             .setFooter({ text: "Nexus" })
             .setTimestamp();
